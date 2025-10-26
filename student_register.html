@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Join Hostel - Student</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container form-card">
+    <h2>Student - Join Hostel</h2>
+    <form id="studentJoinForm">
+      <label>Student Name<input required name="studentName" /></label>
+      <label>Phone Number<input name="phone" required /></label>
+      <label>College / Company<input name="org" /></label>
+      <label>Hostel ID to Join<input name="hostelId" placeholder="e.g., Harsha123" required /></label>
+      <label>Room Number (optional)<input name="room" /></label>
+      <div class="row">
+        <button class="btn" type="submit">Join Hostel</button>
+        <a class="btn ghost" href="index.html">Cancel</a>
+      </div>
+    </form>
+    <div id="result" class="note"></div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('studentJoinForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const student = {
+        studentName: fd.get('studentName').trim(),
+        phone: fd.get('phone').trim(),
+        org: fd.get('org').trim(),
+        room: fd.get('room').trim()||null,
+      };
+      const hostelId = fd.get('hostelId').trim();
+      const res = joinHostel(student, hostelId);
+      const out = document.getElementById('result');
+      if(res.success){
+        out.innerHTML = '<strong>Joined successfully!</strong> You can login using your phone number as username. <a class="btn" href="login.html">Login</a>';
+        e.target.reset();
+      } else {
+        out.innerHTML = '<strong>Error:</strong> '+res.message;
+      }
+    });
+  </script>
+</body>
+</html>

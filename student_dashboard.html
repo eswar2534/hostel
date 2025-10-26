@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Student Dashboard</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="dash-header">
+      <h1 id="studentTitle">Student Dashboard</h1>
+      <div>
+        <button class="btn" id="logoutBtn">Logout</button>
+      </div>
+    </header>
+
+    <section class="card">
+      <h3>Your Hostel</h3>
+      <div id="yourHostel"></div>
+    </section>
+
+    <section class="card">
+      <h3>Payments</h3>
+      <div id="studentPayments"></div>
+      <div class="row">
+        <button class="btn" id="payBtn">Pay ₹500 (Demo)</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Actions</h3>
+      <div class="row">
+        <button class="btn ghost" id="vacateBtn">Vacate (Clear your data)</button>
+        <button class="btn ghost" id="changeRoomBtn">Request Room Change</button>
+      </div>
+    </section>
+  </div>
+
+<script src="app.js"></script>
+<script>
+  ensureLoggedIn('student');
+  const user = getCurrentUser();
+  const student = getStudent(user.username);
+  const hostel = getHostelById(student.hostelId);
+  document.getElementById('studentTitle').textContent = student.studentName + ' — Student Dashboard';
+  document.getElementById('yourHostel').innerHTML = '<p><strong>Hostel:</strong> '+hostel.hostelName+' (ID: '+hostel.id+')</p><p><strong>Owner:</strong> '+hostel.ownerName+' — '+hostel.contact+'</p><p><strong>Room:</strong> '+(student.room||'Not assigned')+'</p>';
+
+  function renderPayments(){
+    const el = document.getElementById('studentPayments');
+    el.innerHTML = '';
+    const payments = getPayments(hostel.id).filter(p=>p.studentPhone===student.phone);
+    if(payments.length===0) el.innerHTML = '<p class="note">No payments yet.</p>';
+    payments.forEach(p=>{
+      const d = document.createElement('div'); d.className='item';
+      d.innerHTML = '<strong>'+p.amount+'</strong> — '+new Date(p.date).toLocaleString();
+      el.appendChild(d);
+    });
+  }
+
+  renderPayments();
+
+  document.getElementById('payBtn').addEventListener('click', ()=>{
+    const ok = confirm('Pay ₹500 now (demo)');
+    if(!ok) return;
+    addPayment(hostel.id, student.phone, student.studentName, 500);
+    alert('Payment recorded (demo).');
+    renderPayments();
+  });
+
+  document.getElementById('vacateBtn').addEventListener('click', ()=>{
+    if(confirm('Vacate hostel? This will remove your record.')){ vacateHostel(student.phone); alert('You have vacated.'); logout(); }
+  });
+
+  document.getElementById('changeRoomBtn').addEventListener('click', ()=>{
+    const r = prompt('Enter requested new room number:');
+    if(r){ requestRoomChange(student.phone, r.trim()); alert('Request sent to owner (simulated).'); }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+</script>
+</body>
+</html>

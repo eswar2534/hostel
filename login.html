@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Login - Hostel App</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container form-card">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <label>Role
+        <select name="role">
+          <option value="owner">Hostel Owner</option>
+          <option value="student">Student</option>
+        </select>
+      </label>
+      <label>Username (Owner: contact, Student: phone)<input name="username" required /></label>
+      <label>Password (any for demo)<input name="password" type="password" required /></label>
+      <div class="row">
+        <button class="btn" type="submit">Login</button>
+        <a class="btn ghost" href="index.html">Home</a>
+      </div>
+    </form>
+    <div id="msg" class="note"></div>
+  </div>
+
+<script src="app.js"></script>
+<script>
+  document.getElementById('loginForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const role = fd.get('role');
+    const username = fd.get('username').trim();
+    const password = fd.get('password');
+    const res = login(role, username, password);
+    const msg = document.getElementById('msg');
+    if(res.success){
+      msg.innerHTML = '<strong>Login successful.</strong> Redirecting...';
+      // Redirect by role
+      if(role==='owner') location.href = 'owner_dashboard.html';
+      else location.href = 'student_dashboard.html';
+    } else {
+      msg.innerHTML = '<strong>Error:</strong> '+res.message;
+    }
+  });
+</script>
+</body>
+</html>

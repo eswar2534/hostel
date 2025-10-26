@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Hostel Listings</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="dash-header">
+      <h1>Public Hostel Listings</h1>
+      <div><a class="btn" href="index.html">Home</a></div>
+    </header>
+
+    <section id="listings" class="card">
+    </section>
+  </div>
+
+<script src="app.js"></script>
+<script>
+  function renderList(){
+    const el = document.getElementById('listings');
+    const hostels = getHostels();
+    if(hostels.length===0) el.innerHTML = '<p class="note">No hostels registered yet.</p>';
+    else {
+      el.innerHTML = '';
+      hostels.forEach(h=>{
+        const d = document.createElement('div'); d.className='item';
+        d.innerHTML = '<h3>'+h.hostelName+'</h3><p><strong>Hostel ID:</strong> '+h.id+' — <strong>Location:</strong> '+h.location+'</p><p><strong>Owner:</strong> '+h.ownerName+' — '+h.contact+'</p><p><strong>Rooms:</strong> '+getRooms(h.id).length+'</p><div class="row"><a class="btn" href="student_register.html">Join</a></div>';
+        el.appendChild(d);
+      });
+    }
+  }
+  renderList();
+</script>
+</body>
+</html>

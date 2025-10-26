@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Owner Dashboard</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="dash-header">
+      <h1 id="hostelTitle">Owner Dashboard</h1>
+      <div>
+        <button class="btn" id="logoutBtn">Logout</button>
+      </div>
+    </header>
+
+    <section class="card">
+      <h3>Hostel Info</h3>
+      <div id="hostelInfo"></div>
+    </section>
+
+    <section class="card">
+      <h3>Rooms</h3>
+      <div id="rooms"></div>
+      <div class="row">
+        <button class="btn" id="addRoomBtn">Add Room</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Students</h3>
+      <div id="studentsList"></div>
+    </section>
+
+    <section class="card">
+      <h3>Payments</h3>
+      <div id="paymentsList"></div>
+    </section>
+
+  </div>
+
+<script src="app.js"></script>
+<script>
+  ensureLoggedIn('owner');
+  const owner = getCurrentUser();
+  const hostel = getHostelByOwner(owner.contact);
+  document.getElementById('hostelTitle').textContent = hostel.hostelName + ' — Owner Dashboard';
+  document.getElementById('hostelInfo').innerHTML = '<p><strong>Hostel ID:</strong> '+hostel.id+'</p><p><strong>Location:</strong> '+hostel.location+'</p><p><strong>WiFi:</strong> '+(hostel.wifi||'N/A')+'</p>';
+
+  function renderRooms(){
+    const roomsDiv = document.getElementById('rooms');
+    roomsDiv.innerHTML = '';
+    const rooms = getRooms(hostel.id);
+    if(rooms.length===0) roomsDiv.innerHTML = '<p class="note">No rooms yet.</p>';
+    rooms.forEach(r=>{
+      const div = document.createElement('div');
+      div.className='item';
+      div.innerHTML = '<strong>'+r.number+'</strong> — '+(r.occupant||'Vacant') + ' <button class="btn ghost" onclick="removeRoom(''+r.number+'')">Remove</button>';
+      roomsDiv.appendChild(div);
+    });
+  }
+
+  function renderStudents(){
+    const el = document.getElementById('studentsList');
+    el.innerHTML = '';
+    const students = getStudentsInHostel(hostel.id);
+    if(students.length===0) el.innerHTML = '<p class="note">No students yet.</p>';
+    students.forEach(s=>{
+      const d = document.createElement('div'); d.className='item';
+      d.innerHTML = '<strong>'+s.studentName+'</strong> — Room: '+(s.room||'Not assigned')+' — Phone: '+s.phone+' <button class="btn" onclick="viewStudent(''+s.phone+'')">View</button>';
+      el.appendChild(d);
+    });
+  }
+
+  function renderPayments(){
+    const el = document.getElementById('paymentsList');
+    el.innerHTML = '';
+    const payments = getPayments(hostel.id);
+    if(payments.length===0) el.innerHTML = '<p class="note">No payments yet.</p>';
+    payments.forEach(p=>{
+      const d = document.createElement('div'); d.className='item';
+      d.innerHTML = '<strong>'+p.studentName+'</strong> — ₹'+p.amount+' — '+new Date(p.date).toLocaleString();
+      el.appendChild(d);
+    });
+  }
+
+  renderRooms();
+  renderStudents();
+  renderPayments();
+
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+  document.getElementById('addRoomBtn').addEventListener('click', ()=>{
+    const num = prompt('Enter room number (e.g., F1-R1):');
+    if(num) { addRoom(hostel.id, num.trim()); renderRooms(); }
+  });
+
+  function removeRoom(number){
+    if(confirm('Remove room '+number+'?')) { deleteRoom(hostel.id, number); renderRooms(); }
+  }
+
+  function viewStudent(phone){
+    const s = getStudent(phone);
+    alert('Student: '+s.studentName+'\nPhone: '+s.phone+'\nRoom: '+(s.room||'Not assigned')+'\nJoined: '+new Date(s.joined).toLocaleString());
+  }
+</script>
+</body>
+</html>
